@@ -5,9 +5,9 @@
 
 PACKAGE_NAME = yosys
 
-# Package version number (git master branch / git tag)
-# PACKAGE_VERSION = master
-PACKAGE_VERSION = 0.25
+# Package version number (git main branch / git tag)
+PACKAGE_VERSION = main
+# PACKAGE_VERSION = 0.41
 
 PACKAGE = $(PACKAGE_NAME)-$(PACKAGE_VERSION)
 
@@ -18,14 +18,11 @@ SYSTEM = unknown
 ifeq ($(findstring Linux, $(shell uname -s)), Linux)
 	SYSTEM = linux
 endif
-ifeq ($(findstring MINGW32, $(shell uname -s)), MINGW32)
-	SYSTEM = mingw32
-endif
+# ifeq ($(findstring MINGW32, $(shell uname -s)), MINGW32)
+# 	SYSTEM = mingw32
+# endif
 ifeq ($(findstring MINGW64, $(shell uname -s)), MINGW64)
 	SYSTEM = mingw64
-endif
-ifeq ($(findstring CYGWIN, $(shell uname -s)), CYGWIN)
-	SYSTEM = cygwin
 endif
 
 # Determine machine.
@@ -52,16 +49,6 @@ ifeq ($(SYSTEM),linux)
 
 	# Installation directory.
 	INSTALL_DIR = /opt
-endif
-
-# Configuration for mingw32 system.
-ifeq ($(SYSTEM),mingw32)
-	# Compiler.
-	CC = /mingw32/bin/gcc
-	CXX = /mingw32/bin/g++
-
-	# Installation directory.
-	INSTALL_DIR = /c/opt
 endif
 
 # Configuration for mingw64 system.
@@ -104,6 +91,7 @@ all:
 .PHONY: clone
 clone:
 	git clone https://github.com/YosysHQ/yosys.git
+	cd $(PACKAGE_NAME) && git submodule update --init
 
 
 .PHONY: pull
@@ -112,8 +100,8 @@ pull:
 	# cd $(PACKAGE_NAME) && git checkout -- .
 	cd $(PACKAGE_NAME) && git reset --hard
 	
-	# Checkout master branch
-	cd $(PACKAGE_NAME) && git checkout master
+	# Checkout main branch
+	cd $(PACKAGE_NAME) && git checkout main
 	
 	# ...
 	cd $(PACKAGE_NAME) && git pull
@@ -126,7 +114,7 @@ prepare:
 	cd $(PACKAGE_NAME) && git reset --hard
 
 	# Checkout specific version
-	cd $(PACKAGE_NAME) && git checkout $(PACKAGE)
+	cd $(PACKAGE_NAME) && git checkout $(PACKAGE_VERSION)
 
 
 .PHONY: configure
@@ -143,9 +131,9 @@ compile:
 
 .PHONY: install
 install:
-	cd $(PACKAGE_NAME) && make install
+	# cd $(PACKAGE_NAME) && make install
 	-mkdir -p $(PREFIX)/share/doc
-	-cd $(PREFIX)/share/doc && wget -nc https://yosys.readthedocs.io/_/downloads/en/latest/pdf/
+	-cd $(PREFIX)/share/doc && wget -nc https://yosyshq.readthedocs.io/_/downloads/yosys/en/latest/pdf/
 	-cd $(PREFIX)/share/doc && mv index.html yosys_manual_latest.pdf
 
 
